@@ -64,6 +64,7 @@ const Chat = ({
   const [messages, setMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [threadId, setThreadId] = useState("");
+  const [isComposing, setIsComposing] = useState(false);
 
   // automitcally scroll to bottom of chat
   const messagesEndRef = useRef(null);
@@ -121,6 +122,7 @@ const Chat = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!userInput.trim()) return;
+    if (isComposing) return
     sendMessage(userInput);
     setMessages((prevMessages) => [
       ...prevMessages,
@@ -208,6 +210,18 @@ const Chat = ({
     });
   };
 
+  const handleCompositionStart = () => {
+    setIsComposing(true)
+  }
+  const handleCompositionEnd = () => {
+    setIsComposing(false)
+  }
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && isComposing) {
+      e.preventDefault()
+    }
+  };
+
   /*
     =======================
     === Utility Helpers ===
@@ -265,6 +279,9 @@ const Chat = ({
           className={styles.input}
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
+          onKeyDown={handleKeyDown}
           placeholder="Enter your question"
         />
         <button
@@ -277,6 +294,5 @@ const Chat = ({
       </form>
     </div>
   );
-};
-
+}
 export default Chat;
